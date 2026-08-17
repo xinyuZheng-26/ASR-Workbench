@@ -1,0 +1,55 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "asr-workbench"
+version = "0.1.0"
+description = "A private, local-browser Chinese ASR workbench."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "ASR Workbench contributors" }]
+dependencies = [
+  "fastapi>=0.115,<1",
+  "platformdirs>=4.2,<5",
+  "python-multipart>=0.0.9,<1",
+  "uvicorn[standard]>=0.30,<1",
+]
+
+[project.optional-dependencies]
+inference = [
+  "funasr>=1.2.6",
+  "modelscope>=1.17",
+  "torch>=2.6,<3",
+  "torchaudio>=2.6,<3",
+]
+build = [
+  "pyinstaller>=6.10,<7",
+]
+
+[dependency-groups]
+dev = [
+  "httpx>=0.27,<1",
+  "pytest>=8.2,<9",
+  "ruff>=0.6,<1",
+]
+
+[project.scripts]
+asr-workbench = "asr_workbench.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["asr_workbench"]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+exclude = ["build", "dist"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

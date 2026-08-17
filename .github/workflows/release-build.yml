@@ -1,0 +1,38 @@
+name: build-local-packages
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+  pull_request:
+
+jobs:
+  package:
+    name: ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            label: macOS
+            command: bash scripts/build_macos.sh
+            artifact: dist/ASR-Workbench-macos.zip
+          - os: ubuntu-latest
+            label: Linux
+            command: bash scripts/build_linux.sh
+            artifact: dist/ASR-Workbench-linux.tar.gz
+          - os: windows-latest
+            label: Windows
+            command: powershell -ExecutionPolicy Bypass -File scripts/build_windows.ps1
+            artifact: dist/ASR-Workbench-windows.zip
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv python install 3.11
+      - run: ${{ matrix.command }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ASR-Workbench-${{ matrix.label }}
+          path: ${{ matrix.artifact }}
+          if-no-files-found: error
